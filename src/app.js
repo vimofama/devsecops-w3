@@ -40,12 +40,15 @@ function authenticateUser(req, res, next) {
 app.get("/api/payments/:studentId", authenticateUser, async (req, res) => {
   const studentId = req.params.studentId;
 
+  if (req.user.studentId !== studentId) {
+    return res.status(403).json({ error: "Forbidden: no tiene acceso a este recurso" });
+  }
+
   const query =
       "SELECT id, student_id, amount, payment_date, receipt_url " +
-      "FROM payments WHERE student_id = " +
-      studentId;
+      "FROM payments WHERE student_id = $1";
 
-  const result = await db.query(query);
+  const result = await db.query(query, [studentId]);
 
   res.json(result.rows);
 });
