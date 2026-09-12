@@ -1,0 +1,23 @@
+# Gate DevSecOps de AulaPay - SAST/secret-scan/SCA/BOLA reales con Semgrep
+name: Semgrep SAST
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  semgrep:
+    name: Escaneo SAST (Semgrep)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Instalar Semgrep
+        run: pip install semgrep
+
+      - name: "Escanear (informativo: secreto + dependencia, no bloqueante)"
+        run: semgrep scan --config .semgrep/informational.yml .
+
+      - name: "Escanear (bloqueante: SQL Injection + BOLA/IDOR)"
+        run: semgrep scan --config .semgrep/blocking.yml --error .

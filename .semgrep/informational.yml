@@ -1,0 +1,33 @@
+rules:
+  - id: aulapay-possible-secret
+    languages: [generic]
+    severity: WARNING
+    message: >
+      Posible secreto/API token expuesto en el repositorio. No bloquea el
+      pipeline: requiere confirmar si es una clave real o un valor de prueba
+      antes de decidir (ver docs/entrega.md, producto 4).
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+    paths:
+      include:
+        - ".env.example"
+    patterns:
+      - pattern-regex: sk_(test|live)_[A-Za-z0-9]+
+
+  - id: aulapay-vulnerable-dependency
+    languages: [generic]
+    severity: WARNING
+    message: >
+      Dependencia con vulnerabilidad conocida (CVE-SIM-2025-1842):
+      pdf-generator-lib@2.4.1. No bloquea el pipeline: actualizar a 2.4.3 o
+      documentar aceptación temporal con plan de remediación (ver
+      docs/entrega.md, producto 5).
+    metadata:
+      category: security
+      cwe: "CWE-1104: Use of Unmaintained Third Party Components"
+    paths:
+      include:
+        - "package.json"
+    patterns:
+      - pattern-regex: "\"pdf-generator-lib\":\\s*\"2\\.4\\.1\""

@@ -1,0 +1,14 @@
+{
+  "name": "aulapay-payments-api",
+  "version": "1.0.0",
+  "description": "Endpoint de comprobantes de pago de AulaPay - reto DevSecOps Clase 3",
+  "main": "src/app.js",
+  "private": true,
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pdf-generator-lib": "2.4.1"
+  }
+}

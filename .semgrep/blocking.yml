@@ -1,0 +1,48 @@
+rules:
+  - id: aulapay-sql-injection-string-concat
+    languages: [javascript]
+    severity: ERROR
+    message: >
+      Posible inyección SQL: se concatena una variable directamente dentro de
+      una cadena SQL en lugar de usar una consulta parametrizada ($1, $2, ...).
+      Referencia: hallazgo SAST-001 del reto DevSecOps (src/app.js).
+    metadata:
+      category: security
+      cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+      owasp: "A03:2021 - Injection"
+      references:
+        - https://owasp.org/www-community/attacks/SQL_Injection
+    patterns:
+      - pattern-either:
+          - pattern: const $QUERY = $STR1 + $STR2 + $VAR
+          - pattern: let $QUERY = $STR1 + $STR2 + $VAR
+          - pattern: var $QUERY = $STR1 + $STR2 + $VAR
+          - pattern: $QUERY = $STR1 + $STR2 + $VAR
+      - metavariable-pattern:
+          metavariable: $STR1
+          patterns:
+            - pattern-regex: (?i)(select|insert|update|delete)\s
+      - metavariable-pattern:
+          metavariable: $VAR
+          patterns:
+            - pattern-not-regex: ^["'`].*["'`]$
+
+  - id: aulapay-missing-object-authorization
+    languages: [javascript]
+    severity: ERROR
+    message: >
+      Posible BOLA/IDOR: la ruta usa un middleware de autenticación pero no
+      valida, dentro del handler, que el recurso solicitado (por ejemplo
+      studentId) pertenezca al usuario autenticado antes de responder.
+      Referencia: hallazgo API_SECURITY_TEST del reto DevSecOps (src/app.js).
+    metadata:
+      category: security
+      cwe: "CWE-639: Authorization Bypass Through User-Controlled Key"
+      owasp: "A01:2021 - Broken Access Control"
+    patterns:
+      - pattern: |
+          app.get($ROUTE, $MW, async ($REQ, $RES) => { ... })
+      - pattern-not: |
+          app.get($ROUTE, $MW, async ($REQ, $RES) => { ... if ($REQ.user.$FIELD !== $VAL) { ... } ... })
+      - pattern-not: |
+          app.get($ROUTE, $MW, async ($REQ, $RES) => { ... if ($REQ.user.$FIELD === $VAL) { ... } ... })
